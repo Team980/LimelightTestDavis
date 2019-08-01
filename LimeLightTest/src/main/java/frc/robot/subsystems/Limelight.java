@@ -20,15 +20,21 @@ public class Limelight extends Subsystem {
   NetworkTableEntry tx;
   NetworkTableEntry ty;
   NetworkTableEntry ta;
+  NetworkTableEntry hasTarget;
 
   public Limelight(){
     table = NetworkTableInstance.getDefault().getTable("limelight");
     tx = table.getEntry("tx");
     ty = table.getEntry("ty");
     ta = table.getEntry("ta");
+    hasTarget = table.getEntry("tv");
   }
   // Put methods for controlling this subsystem
   // here. Call these from Commands.
+
+  public boolean hasTarget() {
+    return hasTarget.getBoolean(false);
+  }
 
   public double getTrackingX(){
     return tx.getDouble(0.0);

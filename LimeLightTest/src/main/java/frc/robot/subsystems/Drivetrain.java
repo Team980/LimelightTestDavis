@@ -19,6 +19,10 @@ public class Drivetrain extends Subsystem {
   private DifferentialDrive drive;
   private double xOffset;
 
+  public final static double CLOSE_ENOUGH_AREA = 20;
+  public final static double TOO_FAR_AREA = 15; 
+  public final static double FORWARD_SPEED = 0.7;
+
   public Drivetrain(){
     drive = new DifferentialDrive(Robot.robotMap.leftDrive, Robot.robotMap.rightDrive);
     xOffset = 0.0;
@@ -34,15 +38,33 @@ public class Drivetrain extends Subsystem {
     drive.stopMotor();
   }
 
-  public void Tracking(){
+
+  public void tracking() {
     xOffset = Robot.limelight.getTrackingX();
-    if (xOffset < -5 || xOffset > 5){
-      drive.arcadeDrive(0, xOffset / 27);
-    }
-   else{
+
+
+    if (xOffset != 0) {
+      double forwardSpeed;
+      double area = Robot.limelight.getTrackingArea();
+      if (area < TOO_FAR_AREA) {
+        System.out.println(" trying to go forward");
+
+        forwardSpeed = FORWARD_SPEED;
+      } else if (area > CLOSE_ENOUGH_AREA) {
+        forwardSpeed = -FORWARD_SPEED;
+      } else {
+        forwardSpeed = 0;
+      }
+
+      double turnSpeed = xOffset / 27;
+      drive.arcadeDrive(forwardSpeed, turnSpeed);
+    } else {
+      System.out.println("no valid targets");
+
       drive.stopMotor();
     }
   }
+
 
   @Override
   public void initDefaultCommand() {

@@ -2,34 +2,39 @@
 /* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
+/* the project.                   `                                            */
 /*----------------------------------------------------------------------------*/
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.Spark;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
 
-/**
- * The RobotMap is a mapping from the ports sensors and actuators are wired into
- * to a variable name. This provides flexibility changing wiring, makes checking
- * the wiring easier and significantly reduces the number of magic numbers
- * floating around.
- */
 public class RobotMap {
-  public Spark leftDrive;
-  public Spark rightDrive;
-
+  public SpeedControllerGroup leftDrive;
+  public SpeedControllerGroup rightDrive;
+  
+  private WPI_VictorSPX leftTop;
+  private WPI_VictorSPX leftFront;
+  private WPI_VictorSPX leftBack;
+ 
+  private WPI_VictorSPX rightTop;
+  private WPI_VictorSPX rightFront;
+  private WPI_VictorSPX rightBack;
+   
+  
   public RobotMap(){
-    leftDrive = new Spark(0);
-    rightDrive = new Spark(1);
-  }
-  // For example to map the left and right motors, you could define the
-  // following variables to use with your drivetrain subsystem.
-  // public static int leftMotor = 1;
-  // public static int rightMotor = 2;
+    leftTop = new WPI_VictorSPX(3);
+    leftTop.setInverted(true);
+    leftFront = new WPI_VictorSPX(1);
+    leftBack = new WPI_VictorSPX(4);
 
-  // If you are using multiple modules, make sure to define both the port
-  // number and the module. For example you with a rangefinder:
-  // public static int rangefinderPort = 1;
-  // public static int rangefinderModule = 1;
+    rightTop = new WPI_VictorSPX(2);
+    rightTop.setInverted(true);
+    rightFront = new WPI_VictorSPX(0);
+    rightBack = new WPI_VictorSPX(5);
+
+    leftDrive = new SpeedControllerGroup(leftTop, leftFront, leftBack);
+    rightDrive = new SpeedControllerGroup(rightTop, rightFront, rightBack);
+  }
 }
