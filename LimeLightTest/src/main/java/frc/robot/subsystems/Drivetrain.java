@@ -43,7 +43,7 @@ public class Drivetrain extends Subsystem {
     xOffset = Robot.limelight.getTrackingX();
 
 
-    if (xOffset != 0) {
+    if (Robot.limelight.hasTarget()) { // TODO: change this to if (xOffset != 0) { .. } if follow stops working
       double forwardSpeed;
       double area = Robot.limelight.getTrackingArea();
       if (area < TOO_FAR_AREA) {
