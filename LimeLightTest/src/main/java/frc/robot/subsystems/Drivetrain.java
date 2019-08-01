@@ -17,9 +17,11 @@ import frc.robot.commands.DriveCommand;
  */
 public class Drivetrain extends Subsystem {
   private DifferentialDrive drive;
+  private double xOffset;
 
   public Drivetrain(){
     drive = new DifferentialDrive(Robot.robotMap.leftDrive, Robot.robotMap.rightDrive);
+    xOffset = 0.0;
   }
   // Put methods for controlling this subsystem
   // here. Call these from Commands.
@@ -33,13 +35,11 @@ public class Drivetrain extends Subsystem {
   }
 
   public void Tracking(){
-    if (Robot.limelight.getTrackingX() < -2){
-      drive.arcadeDrive(0, -.4);
+    xOffset = Robot.limelight.getTrackingX();
+    if (xOffset < -5 || xOffset > 5){
+      drive.arcadeDrive(0, xOffset / 27);
     }
-    else if (Robot.limelight.getTrackingX() > 2){
-      drive.arcadeDrive(0, .4);
-    }
-    else{
+   else{
       drive.stopMotor();
     }
   }
