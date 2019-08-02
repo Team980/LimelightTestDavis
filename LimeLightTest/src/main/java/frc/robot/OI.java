@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.TrackingCommand;
+import frc.robot.commands.SetGearCommand; 
 
 /**
  * This class is the glue that binds the controls on the physical operator
@@ -22,6 +23,9 @@ public class OI {
 
   public JoystickButton activateTracking;
   public JoystickButton deactivateTracking;
+  public JoystickButton lowShiftGear;
+  public JoystickButton highShiftGear;
+  
 
   public OI(){
     throttle = new Joystick(0);
@@ -32,7 +36,16 @@ public class OI {
     
     deactivateTracking = new JoystickButton(throttle, 2);
     deactivateTracking.whenPressed(new DriveCommand());
+    
+    lowShiftGear = new JoystickButton(throttle, 4);
+    lowShiftGear.whenPressed(new SetGearCommand(true));
+
+    highShiftGear = new JoystickButton(throttle, 5);
+    highShiftGear.whenPressed(new SetGearCommand(false));
+
   }
+
+
   //// CREATING BUTTONS
   // One type of button is a joystick button which is any button on a
   //// joystick.

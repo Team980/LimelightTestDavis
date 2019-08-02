@@ -9,6 +9,10 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.CounterBase;
+
 
 public class RobotMap {
   public SpeedControllerGroup leftDrive;
@@ -22,7 +26,11 @@ public class RobotMap {
   private WPI_VictorSPX rightFront;
   private WPI_VictorSPX rightBack;
    
-  
+  public Solenoid shifter; 
+
+  public Encoder leftEncoder;
+  public Encoder rightEncoder;
+
   public RobotMap(){
     leftTop = new WPI_VictorSPX(3);
     leftTop.setInverted(true);
@@ -36,5 +44,16 @@ public class RobotMap {
 
     leftDrive = new SpeedControllerGroup(leftTop, leftFront, leftBack);
     rightDrive = new SpeedControllerGroup(rightTop, rightFront, rightBack);
+
+    shifter = new Solenoid (0); 
+
+    leftEncoder = new Encoder(7 , 8 , false , CounterBase.EncodingType.k4X);
+    //(Channel A port , Channel B port , is it inverted true/false , encoder type)
+    leftEncoder.setDistancePerPulse((2 * (Math.PI) * (2.0 / 12)) / 2048.0);
+
+    rightEncoder = new Encoder(4 , 5 , true , CounterBase.EncodingType.k4X);
+    //(Channel A port , Channel B port , is it inverted true/false , encoder type)
+    rightEncoder.setDistancePerPulse((2 * (Math.PI) * (2.0 / 12)) / 2048.0);
+
   }
 }
