@@ -16,11 +16,17 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  * Add your docs here.
  */
 public class Limelight extends Subsystem {
+  public static final double BALL_TARGET_PIPELINE_INDEX = 0;
+  public static final double VISION_TARGET_PIPELINE_INDEX = 1;
+
+
   NetworkTable table;
   NetworkTableEntry tx;
   NetworkTableEntry ty;
   NetworkTableEntry ta;
   NetworkTableEntry tv;
+  NetworkTableEntry pipelineIndex;
+
 
   public Limelight(){
     table = NetworkTableInstance.getDefault().getTable("limelight");
@@ -31,6 +37,10 @@ public class Limelight extends Subsystem {
   }
   // Put methods for controlling this subsystem
   // here. Call these from Commands.
+
+  public void setPipelineIndex(double index) {
+    pipelineIndex.setDouble(index);
+  }
 
   public boolean hasTarget() {
     return tv.getDouble(0.0) == 1; // is 1 when there is a valid target

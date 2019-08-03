@@ -18,8 +18,14 @@ import edu.wpi.first.wpilibj.Solenoid;
  * Add your docs here.
  */
 public class Drivetrain extends Subsystem {
+
   private DifferentialDrive drive;
+  private boolean hasSeenTarget = false;
+
   private double xOffset;
+  //value between -29 and 29
+  //distance between tracking object and center of limelight
+  //if no object is tracked, the value is zero
 
   public final static double CLOSE_ENOUGH_AREA = 20;
   public final static double TOO_FAR_AREA = 15; 
@@ -27,7 +33,8 @@ public class Drivetrain extends Subsystem {
   private Solenoid shifter;
   
   private boolean trackingComplete;
-  private boolean notFound; 
+  private boolean notFound;
+   
 
   private Encoder leftEncoder; 
   private Encoder rightEncoder; 
@@ -36,7 +43,6 @@ public class Drivetrain extends Subsystem {
 
   public Drivetrain(){
     drive = new DifferentialDrive(Robot.robotMap.leftDrive, Robot.robotMap.rightDrive);
-    xOffset = 0.0;
     shifter = Robot.robotMap.shifter;
     trackingComplete = false; 
     notFound = true; 
@@ -48,34 +54,68 @@ public class Drivetrain extends Subsystem {
 
   public void driveRobot(double move , double turn){
     drive.arcadeDrive(move, turn);
+    
+    /* other drive options are:
+      drive.tankDrive(leftSideSpeed, rightSideSpeed);
+      drive.curvatureDrive(speed,angle,doYouWantCoolturns?); */
+   
   }
 
   public void disable(){
     drive.stopMotor();
   }
+  public void tracking2Revised()
+  {
+    xOffset = Robot.limelight.getTrackingX();
+
+    if(Robot.limelight.hasTarget())//if you see the ball
+    {
+      hasSeenTarget = true;
+      drive.arcadeDrive(FORWARD_SPEED, xOffset/27);
+      resetEncoderDistance();
+    }
+    else
+    {
+      if(hasSeenTarget)//if you saw the ball
+      {
+        if(getLeftDistance() + getRightDistance() < 3)//drive forward a foot and a half
+        {
+          drive.arcadeDrive(0.6,0);
+        }
+        else//after, stop
+        {
+        drive.stopMotor();
+        }
+      }
+      else//if you sawn't the ball then spin
+      {
+        drive.arcadeDrive(0,0.5);
+      }
+    }
+  }
 
   public void tracking2(){
     xOffset = Robot.limelight.getTrackingX();
     if (Robot.limelight.hasTarget()) {
-        double area = Robot.limelight.getTrackingArea();
-        notFound = false;
+      double area = Robot.limelight.getTrackingArea();
+      notFound = false;
+      
       if (area < TOO_FAR_AREA) {
-        System.out.println(" trying to go forward");
         double turnSpeed = xOffset / 27;
         drive.arcadeDrive(FORWARD_SPEED , turnSpeed);
+        resetEncoderDistance(); 
       } 
       else {
         drive.stopMotor();  
       }
     } 
     else if (notFound) {
-      System.out.println("no valid targets");
-      drive.arcadeDrive(0 , 0.4);
+     
+      drive.arcadeDrive(0 , 0.5);
     }
     else {
-      resetEncoderDistance(); 
-      if (getLeftDistance() < 2 || getRightDistance() < 2) {
-        drive.arcadeDrive(7,0);
+      if (getLeftDistance() < 1.5 || getRightDistance() < 1.5) {
+        drive.arcadeDrive(0.6,0);
       }
       else {
         drive.stopMotor();
@@ -87,7 +127,7 @@ public class Drivetrain extends Subsystem {
   public void tracking() {
     xOffset = Robot.limelight.getTrackingX();
 
-    if (Robot.limelight.hasTarget()) { // TODO: change this to if (xOffset != 0) { .. } if follow stops working
+    if (Robot.limelight.hasTarget()) {
       double forwardSpeed;
       double area = Robot.limelight.getTrackingArea();
       if (area < TOO_FAR_AREA) {
