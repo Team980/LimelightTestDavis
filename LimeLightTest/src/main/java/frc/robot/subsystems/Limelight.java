@@ -34,6 +34,7 @@ public class Limelight extends Subsystem {
     ty = table.getEntry("ty");
     ta = table.getEntry("ta");
     tv = table.getEntry("tv");
+    pipelineIndex = table.getEntry("pipeline");
   }
   // Put methods for controlling this subsystem
   // here. Call these from Commands.

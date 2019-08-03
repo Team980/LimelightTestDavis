@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.TrackingCommand;
 import frc.robot.commands.SetGearCommand; 
+import frc.robot.commands.VisionTargetTrackCommand;
 
 /**
  * This class is the glue that binds the controls on the physical operator
@@ -32,7 +33,7 @@ public class OI {
     wheel = new Joystick(1);
 
     activateTracking = new JoystickButton(throttle, 1);
-    activateTracking.whenPressed(new TrackingCommand());
+    activateTracking.whenPressed(new VisionTargetTrackCommand());
     
     deactivateTracking = new JoystickButton(throttle, 2);
     deactivateTracking.whenPressed(new DriveCommand());

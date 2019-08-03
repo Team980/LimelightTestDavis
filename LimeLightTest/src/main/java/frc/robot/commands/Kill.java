@@ -9,10 +9,11 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
-import frc.robot.subsystems.Limelight;
 
-public class TrackingCommand extends Command {
-  public TrackingCommand() {
+public class Kill extends Command {
+  // disables enemy robot once we've completed the match
+  
+  public Kill() {
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
     requires(Robot.drivetrain);
@@ -21,21 +22,20 @@ public class TrackingCommand extends Command {
   // Called just before this Command runs the first time
   @Override
   protected void initialize() {
-    System.out.println(Limelight.BALL_TARGET_PIPELINE_INDEX);
-    Robot.limelight.setPipelineIndex(Limelight.BALL_TARGET_PIPELINE_INDEX);
-
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    Robot.drivetrain.tracking2();
+   // Robot otherRobot = Field.hack.getTeam(330);
+   // otherRobot.drivetrain.stopMotors();
+   // otherRobot.liftSystem.motor = null;
   }
 
   // Make this return true when this Command no longer needs to run execute()
   @Override
   protected boolean isFinished() {
-    return Robot.drivetrain.getTrackingComplete();
+    return false;
   }
 
   // Called once after isFinished returns true
@@ -47,6 +47,14 @@ public class TrackingCommand extends Command {
   // subsystems is scheduled to run
   @Override
   protected void interrupted() {
-    Robot.drivetrain.disable();
+  }
+
+  static enum Color {
+    RED,
+    BLUE;
+
+    double toPipelineIndex() {
+      return (this == RED)? 2 : 3;
+    }
   }
 }

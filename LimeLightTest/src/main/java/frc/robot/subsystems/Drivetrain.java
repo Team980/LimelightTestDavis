@@ -21,15 +21,21 @@ public class Drivetrain extends Subsystem {
 
   private DifferentialDrive drive;
   private boolean hasSeenTarget = false;
+  double area;
+  //area of target object
 
   private double xOffset;
   //value between -29 and 29
   //distance between tracking object and center of limelight
   //if no object is tracked, the value is zero
 
-  public final static double CLOSE_ENOUGH_AREA = 20;
-  public final static double TOO_FAR_AREA = 15; 
-  public final static double FORWARD_SPEED = 0.5;
+  public final static double TOO_CLOSE = 20;
+  public final static double TOO_FAR = 15; 
+  public final static double SPEED = 0.5;
+
+  private final static double TARGET_AREA = 17.5;
+  private final static double DEADBAND_RADIUS = 2.5;
+
   private Solenoid shifter;
   
   private boolean trackingComplete;
@@ -71,7 +77,7 @@ public class Drivetrain extends Subsystem {
     if(Robot.limelight.hasTarget())//if you see the ball
     {
       hasSeenTarget = true;
-      drive.arcadeDrive(FORWARD_SPEED, xOffset/27);
+      drive.arcadeDrive(SPEED, xOffset/27);
       resetEncoderDistance();
     }
     else
@@ -100,9 +106,9 @@ public class Drivetrain extends Subsystem {
       double area = Robot.limelight.getTrackingArea();
       notFound = false;
       
-      if (area < TOO_FAR_AREA) {
+      if (area < TOO_FAR) {
         double turnSpeed = xOffset / 27;
-        drive.arcadeDrive(FORWARD_SPEED , turnSpeed);
+        drive.arcadeDrive(SPEED , turnSpeed);
         resetEncoderDistance(); 
       } 
       else {
@@ -126,31 +132,35 @@ public class Drivetrain extends Subsystem {
   
   public void tracking() {
     xOffset = Robot.limelight.getTrackingX();
-
+    area = Robot.limelight.getTrackingArea();  
+     
     if (Robot.limelight.hasTarget()) {
-      double forwardSpeed;
-      double area = Robot.limelight.getTrackingArea();
-      if (area < TOO_FAR_AREA) {
-        System.out.println(" trying to go forward");
+      // if (TOO_CLOSE < area && area < TOO_FAR){
+      //   drive.arcadeDrive(0, xOffset / 27);
+      // } else {
+      //   drive.arcadeDrive(Math.signum(area - TOO_FAR)* SPEED, xOffset/27); 
+      // }
 
-        forwardSpeed = FORWARD_SPEED;
-      } 
-      else if (area > CLOSE_ENOUGH_AREA) {
-        forwardSpeed = -FORWARD_SPEED;
-      } 
-      else {
-        forwardSpeed = 0;
-      }
+      double speed = betterSignum(area-TARGET_AREA, DEADBAND_RADIUS)*SPEED;
+      //double speed = Math.copySign(roundToZero(area - TARGET_AREA, DEADBAND_RADIUS), SPEED);
+      System.out.println(speed);
+      double turn = xOffset/27.0;
 
-      double turnSpeed = xOffset / 27;
-      drive.arcadeDrive(forwardSpeed, turnSpeed);
-    } 
-    else {
-      System.out.println("no valid targets");
+      drive.arcadeDrive(speed, turn);
+        
+    } else {
       drive.stopMotor();
   
     }
   }
+ 
+  public double betterSignum(double x, double radius) {
+    if (Math.abs(x) < radius) {
+      return Math.signum(x);
+    } else {
+      return 0;
+    }
+  } 
 
  public double getLeftDistance(){
     return leftEncoder.getDistance();
@@ -163,6 +173,10 @@ public class Drivetrain extends Subsystem {
   public void resetEncoderDistance(){
     leftEncoder.reset();
     rightEncoder.reset();
+  }
+
+  public void stopMotors() {
+    drive.stopMotor();
   }
 
   public void setLowGear () {

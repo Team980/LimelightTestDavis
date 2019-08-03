@@ -9,11 +9,15 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
+import frc.robot.subsystems.Limelight;
+
 
 public class VisionTargetTrackCommand extends Command {
   private boolean reachedTarget = false;
-  private static final double CLOSE_ENOUGH_AREA = 30;
-  private static final double FORWARD_SPEED = 0.7;
+  private static final double TARGET_AREA = 30;
+  private static final double AREA_DEADBAND = 5;
+  private static final double FORWARD_SPEED = 0.4;
+  
 
   public VisionTargetTrackCommand() {
     
@@ -26,22 +30,41 @@ public class VisionTargetTrackCommand extends Command {
   // Called just before this Command runs the first time
   @Override
   protected void initialize() {
-      Robot.limelight.setPipelineIndex(Robot.limelight.VISION_TARGET_PIPELINE_INDEX);
+      Robot.limelight.setPipelineIndex(Limelight.VISION_TARGET_PIPELINE_INDEX);
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
     if (Robot.limelight.hasTarget()) {
-        double area = Robot.limelight.getTrackingArea();
+      double area = Robot.limelight.getTrackingArea();
+      double xOffset = Robot.limelight.getTrackingX();
 
-        if (area >= CLOSE_ENOUGH_AREA) {
-            reachedTarget = true;
-        }
+      if (isTooClose(area)) {
+        Robot.drivetrain.driveRobot(-FORWARD_SPEED, xOffset / 27);
+
+      } else if (isTooFar(area)) {
+        Robot.drivetrain.driveRobot(FORWARD_SPEED, xOffset / 27);
+
+      } else {
+          // just right
+        reachedTarget = true;
+      }
+
     } else {
-        Robot.drivetrain.driveRobot(0, 0);
+      Robot.drivetrain.stopMotors();
     }
   }
+
+  public static boolean isTooClose(double area) {
+    return area > TARGET_AREA+AREA_DEADBAND/2; 
+  }
+
+  public static boolean isTooFar(double area) {
+    return area < TARGET_AREA-AREA_DEADBAND/2;
+  }
+
+
 
   // Make this return true when this Command no longer needs to run execute()
   @Override
@@ -52,6 +75,7 @@ public class VisionTargetTrackCommand extends Command {
   // Called once after isFinished returns true
   @Override
   protected void end() {
+    Robot.drivetrain.stopMotors();
   }
 
   // Called when another command which requires one or more of the same
